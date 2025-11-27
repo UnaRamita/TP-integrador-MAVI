@@ -14,10 +14,10 @@ Player::Player(float x, float scl, float spd) {
 	InLava = false;
 
 	Speed = spd;
-	JumpSpeed = 150.0;
+	JumpSpeed = 400;
 	JumpTime = 0.5;
 	JumpDuration = 0;
-	Gravity = 200;
+	Gravity = 300;
 	Scale = scl;	
 	Rotation = 0;
 	HitBox = { (float)TextureP.width*scl, (float)TextureP.height*scl };
@@ -84,14 +84,13 @@ void Player::move() {
 		Pos.y -= JumpSpeed * dt;
 		JumpDuration += GetFrameTime();
 	}
-	//esto terminar de arreglarlo la idea es que cuando esta justo encima de la lava si no esta saltando caiga
-	//para eso voy a hacer un bool que sea toando la lava, y dsp de caer un poco resetee al personaje de posicion 
+	//lava
 	if (Pos.x >= Lava.x && Pos.x <= Lava.y && Pos.y >= Piso - HitBox.y) {
 		InFloor = false;
 		InLava = true;
 	}
 	else { InLava = false; }
-	if (InLava == true && Pos.y >= GetScreenHeight()) {
+	if (InLava == true && Pos.y >= GetScreenHeight()-20) {
 		Pos = InitPos;
 	}
 	if (Pos.y >= Piso-HitBox.y && InLava==false) {

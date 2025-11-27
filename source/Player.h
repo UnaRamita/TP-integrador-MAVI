@@ -1,6 +1,5 @@
-#include <iostream>
 #include "Hud.h"
-#include "raylib.h"
+#include "Plataformas.h"
 
 using namespace std;
 class Player {
