@@ -1,3 +1,4 @@
+#include <vector>
 #include "Hud.h"
 #include "Plataformas.h"
 
@@ -15,7 +16,10 @@ private:
 	Vector3 Lava;
 
 	bool InFloor;
-	bool Jumping;
+	bool InPlatform;
+	bool BrPlatform;
+	bool BlPlatform;
+;	bool Jumping;
 	bool InLava;
 
 	float Speed;
@@ -33,13 +37,14 @@ private:
 	Hud hud;
 
 	void inputs();
+	void HbxColiderP(const std::vector<Plataformas>& plataformas);
 	void move();
 	void draw();
 public:
 	Player(float x, float scl, float spd);
 
 	Vector2 getpos()const { return Pos; } //esto para poner la posicion en pantalla
-
-	void Update();
+	//std::vector<Plataformas>& plataformas esto es basicamente para que tome la lista de plataformas del nivel para detectar colisiones
+	void Update(const std::vector<Plataformas>& plataformas);
 
 };

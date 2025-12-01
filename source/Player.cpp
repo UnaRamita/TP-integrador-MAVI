@@ -10,6 +10,9 @@ Player::Player(float x, float scl, float spd) {
 	Lava = { 670,800,48 };
 
 	Jumping = false;
+	InPlatform = false;
+	BrPlatform = false;
+	BlPlatform = false;
 	InFloor = false;
 	InLava = false;
 
@@ -43,7 +46,7 @@ void Player::inputs() {
 		Vel.x -= Speed;
 	}
 	//Salto
-	if (IsKeyPressed(KEY_SPACE) && InFloor == true) {
+	if (IsKeyPressed(KEY_SPACE) && InFloor == true || IsKeyPressed(KEY_SPACE) && InPlatform == true) {
 		Jumping = true;
 		Vel.y += JumpSpeed;
 		PlaySound(JumpS);
@@ -52,17 +55,57 @@ void Player::inputs() {
 		Pos = InitPos;
 	}
 }
+void Player::HbxColiderP(const std::vector<Plataformas>& plataformas) {
+
+	InPlatform = false;
+	BlPlatform = false;
+	BrPlatform = false;
+
+
+	for (int i = 0; i < plataformas.size(); i++)
+	{
+		//colision superior
+		if (Pos.x >= plataformas[i].getPHbx().x && Pos.x <= plataformas[i].getPHbx().x + plataformas[i].getPHbx().width || Pos.x + HitBox.x>= plataformas[i].getPHbx().x && Pos.x + HitBox.x <= plataformas[i].getPHbx().x + plataformas[i].getPHbx().width) {
+			if (Pos.y + HitBox.y >= plataformas[i].getPHbx().y && Pos.y + HitBox.y < plataformas[i].getPHbx().y + plataformas[i].getPHbx().height){
+				InPlatform = true;
+				break;
+			}
+			else { InPlatform = false; }
+		}
+		else { InPlatform = false; }
+		//colision izq
+		if (Pos.x + HitBox.x >= plataformas[i].getPHbx().x && Pos.x + HitBox.x >= plataformas[i].getPHbx().x + plataformas[i].getPHbx().width) {
+			if (Pos.y <= plataformas[i].getPHbx().y + plataformas[i].getPHbx().height && Pos.y + HitBox.y >= plataformas[i].getPHbx().y) {
+				BlPlatform = true;
+				break;
+			}
+			else { BlPlatform = false; }
+		}
+		else { BlPlatform = false; }
+		// colision der
+		if (Pos.x + HitBox.x >= plataformas[i].getPHbx().x && Pos.x + HitBox.x >= plataformas[i].getPHbx().x + plataformas[i].getPHbx().width) {
+			if (Pos.y <= plataformas[i].getPHbx().y + plataformas[i].getPHbx().height && Pos.y + HitBox.y >= plataformas[i].getPHbx().y) {
+				BrPlatform = true;
+				break;
+			}
+			else { BrPlatform = false; }
+		}
+		else { BrPlatform = false; }
+
+	}
+	
+}
 void Player::move() {
 	//deltatime para que la velocidad sea igual independientemente de los frames
 	float dt = GetFrameTime();
 
-	if (Pos.x > 0 && Pos.x+HitBox.x < BordeD) {
+	if (Pos.x > 0 && Pos.x+HitBox.x < BordeD && BlPlatform==false) {
 		Pos.x += Vel.x*dt;
 	}
-	else if (Pos.x <= 0 && Vel.x > BordeI) {
+	else if (Pos.x <= 0 && Vel.x > BordeI && BrPlatform == false) {
 		Pos.x += Vel.x * dt;
 	}
-	else if (Pos.x + HitBox.x >= BordeD && Vel.x < BordeI) {
+	else if (Pos.x + HitBox.x >= BordeD && Vel.x < BordeI && BrPlatform == false) {
 		Pos.x += Vel.x * dt;
 	}
 	//por si pasa los bordes
@@ -73,7 +116,7 @@ void Player::move() {
 		Pos.x = BordeD - HitBox.x;
 	}
 	//gravedad y salto
-	if (Jumping == false && InFloor== false) {
+	if (Jumping == false && InFloor== false && InPlatform == false) {
 		Pos.y += Gravity*dt;
 	}
 	if (JumpDuration >= JumpTime) {
@@ -93,12 +136,13 @@ void Player::move() {
 	if (InLava == true && Pos.y >= GetScreenHeight()-20) {
 		Pos = InitPos;
 	}
+	//deteccion piso
 	if (Pos.y >= Piso-HitBox.y && InLava==false) {
 			InFloor = true;
 			//por si se traspasa el piso
 			Pos.y = Piso - HitBox.y;
 	}
-	else if (Pos.y < Piso - HitBox.y) { InFloor = false; }
+	else if (Pos.y < Piso - HitBox.y && InPlatform == false) { InFloor = false; }
 }
 void Player::draw() {
 	//Dibujo de textura
@@ -113,8 +157,9 @@ void Player::draw() {
 	//	DrawText("Jump: TRUE", 20, 20, 10, WHITE);
 	//}
 }
-void Player::Update() {
+void Player::Update(const std::vector<Plataformas>& plataformas) {
 	inputs();
+	HbxColiderP(plataformas);
 	move();
 	draw();
 	hud.Update(Pos);

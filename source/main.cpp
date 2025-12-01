@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "Player.h"
+#include "Plataformas.h"
 
 using namespace std;
 //tamaño de ventana
@@ -19,6 +20,10 @@ int main(void)
 
     SetTargetFPS(60);
 
+    std::vector<Plataformas> plataformas;
+    plataformas.emplace_back(1000, 250, 2);
+    plataformas.emplace_back(1000, 550, 2);
+
     // Bucle principal del juego (se repite hasta que se cierre la ventana)
     while (!WindowShouldClose())
     {
@@ -26,7 +31,11 @@ int main(void)
         BeginDrawing();
 
         window.Update();
-        player.Update();
+        player.Update(plataformas);
+        for (int i = 0; i < plataformas.size(); i++)
+        {
+            plataformas[i].draw();
+        }
 
         // Finalizamos el dibujo
         EndDrawing();
