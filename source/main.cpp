@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "Player.h"
 #include "Plataformas.h"
+#include "Slime.h"   
 
 using namespace std;
 //tamaño de ventana
@@ -17,12 +18,17 @@ int main(void)
     //clases
     Window window;
     Player player(100, 1, 300);
+    Slime slime(336,280);
 
     SetTargetFPS(60);
 
     std::vector<Plataformas> plataformas;
-    plataformas.emplace_back(1000, 250, 2);
-    plataformas.emplace_back(1000, 550, 2);
+    plataformas.emplace_back(284, 144, 3);
+    plataformas.emplace_back(24, 240, 1);
+    plataformas.emplace_back(96, 384, 2);
+    plataformas.emplace_back(336, 384, 4);
+    plataformas.emplace_back(816, 384, 2);
+    plataformas.emplace_back(1008, 528, 2);
 
     // Bucle principal del juego (se repite hasta que se cierre la ventana)
     while (!WindowShouldClose())
@@ -36,7 +42,7 @@ int main(void)
         {
             plataformas[i].draw();
         }
-
+        slime.Update(plataformas);
         // Finalizamos el dibujo
         EndDrawing();
     }

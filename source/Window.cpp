@@ -8,6 +8,8 @@ Window::Window() {
 
 	MousePos = GetMousePosition();
 
+	ButtonPos = { 576 ,288 };
+
 	ButtonAct = false;
 }
 void Window::Load() {
@@ -17,13 +19,13 @@ void Window::Load() {
 	//fondo
 	DrawTextureEx(BackgroundTexture, { 0,0 }, 0.0f, 1.0f, BackGroundColor);
 	//boton
-	DrawTextureEx(ButtonTexture, { 800,370 }, 0.0f, 1.0f, BackGroundColor);
+	DrawTextureEx(ButtonTexture, { ButtonPos }, 0.0f, 1.0f, BackGroundColor);
 }
 void Window::Inputs() {
 	//toma la posicion del mouse
 	MousePos = GetMousePosition();
 	//detecta si se toca sobre la zona donde esta el boton
-	if (MousePos.x>=800&&MousePos.x<=915&&MousePos.y>=370&&MousePos.y<=425&&IsMouseButtonPressed(MOUSE_BUTTON_LEFT)==true) {
+	if (MousePos.x>=ButtonPos.x && MousePos.x<=ButtonPos.x+ButtonTexture.width && MousePos.y>=ButtonPos.y && MousePos.y<=ButtonPos.y+ButtonTexture.height && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)==true) {
 		ButtonAct = !ButtonAct;
 	}
 	//cambia el color del fondo

@@ -19,6 +19,7 @@ private:
 	bool InPlatform;
 	bool BrPlatform;
 	bool BlPlatform;
+	bool HitHead;
 ;	bool Jumping;
 	bool InLava;
 

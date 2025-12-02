@@ -13,6 +13,7 @@ Player::Player(float x, float scl, float spd) {
 	InPlatform = false;
 	BrPlatform = false;
 	BlPlatform = false;
+	HitHead = false;
 	InFloor = false;
 	InLava = false;
 
@@ -57,57 +58,90 @@ void Player::inputs() {
 }
 void Player::HbxColiderP(const std::vector<Plataformas>& plataformas) {
 
+	// Reset de estados al principio del frame
 	InPlatform = false;
 	BlPlatform = false;
 	BrPlatform = false;
-
+	HitHead = false;
 
 	for (int i = 0; i < plataformas.size(); i++)
 	{
-		//colision superior
-		if (Pos.x >= plataformas[i].getPHbx().x && Pos.x <= plataformas[i].getPHbx().x + plataformas[i].getPHbx().width || Pos.x + HitBox.x>= plataformas[i].getPHbx().x && Pos.x + HitBox.x <= plataformas[i].getPHbx().x + plataformas[i].getPHbx().width) {
-			if (Pos.y + HitBox.y >= plataformas[i].getPHbx().y && Pos.y + HitBox.y < plataformas[i].getPHbx().y + plataformas[i].getPHbx().height){
-				InPlatform = true;
-				break;
-			}
-			else { InPlatform = false; }
-		}
-		else { InPlatform = false; }
-		//colision izq
-		if (Pos.x + HitBox.x >= plataformas[i].getPHbx().x && Pos.x + HitBox.x >= plataformas[i].getPHbx().x + plataformas[i].getPHbx().width) {
-			if (Pos.y <= plataformas[i].getPHbx().y + plataformas[i].getPHbx().height && Pos.y + HitBox.y >= plataformas[i].getPHbx().y) {
-				BlPlatform = true;
-				break;
-			}
-			else { BlPlatform = false; }
-		}
-		else { BlPlatform = false; }
-		// colision der
-		if (Pos.x + HitBox.x >= plataformas[i].getPHbx().x && Pos.x + HitBox.x >= plataformas[i].getPHbx().x + plataformas[i].getPHbx().width) {
-			if (Pos.y <= plataformas[i].getPHbx().y + plataformas[i].getPHbx().height && Pos.y + HitBox.y >= plataformas[i].getPHbx().y) {
-				BrPlatform = true;
-				break;
-			}
-			else { BrPlatform = false; }
-		}
-		else { BrPlatform = false; }
+		Rectangle r = plataformas[i].getPHbx();
 
+		// tolerancia en píxeles no deberia ser una cantidad visible pero sino a veces sobre pasa
+		const float margin = 10.0f; 
+
+		// Bordes del jugador
+		float leftP = Pos.x;
+		float rightP = Pos.x + HitBox.x;
+		float topP = Pos.y;
+		float bottomP = Pos.y + HitBox.y;
+
+		// Bordes de la plataforma
+		float leftPl = r.x;
+		float rightPl = r.x + r.width;
+		float topPl = r.y;
+		float bottomPl = r.y + r.height;
+
+		// Solapamiento horizontal y vertical
+		bool overlapX = (rightP > leftPl) && (leftP < rightPl);
+		bool overlapY = (bottomP > topPl) && (topP < bottomPl);
+
+		// colision superior
+		if (overlapX && bottomP >= topPl && bottomP <= topPl + margin)
+		{
+			InPlatform = true;
+			InFloor = false;            
+		}
+		// colision inferior
+		if (overlapX && topP <= bottomPl && topP >= bottomPl - margin)
+		{
+			HitHead = true;
+		}
+		//colision lateral izq
+		if (overlapY && rightP > leftPl && leftP < leftPl && InPlatform==false )                  
+		{
+				BlPlatform = true;
+		}
+		//colision lateral der
+		if (overlapY && leftP < rightPl && rightP > rightPl && InPlatform == false )
+		{
+			BrPlatform = true;
+		}
+		// debug util dsp sacar
+		/*if (InPlatform) {
+			DrawText("PLAT TOP", 10, 10, 20, GREEN);
+		}
+		if (HitHead) {
+			DrawText("PLAT BOTTOM", 10, 40, 20, YELLOW);
+		}*/
 	}
-	
 }
 void Player::move() {
 	//deltatime para que la velocidad sea igual independientemente de los frames
 	float dt = GetFrameTime();
+	//Nuevo movimiento lateral
+	if (Vel.x > 0) { 
+		if (!BlPlatform && Pos.x + HitBox.x < BordeD) {
+			Pos.x += Vel.x * dt;
+		}
+	}
+	else if (Vel.x < 0) { 
+		if (!BrPlatform && Pos.x > BordeI) {
+			Pos.x += Vel.x * dt;
+		}
+	}
+     //limites pantalla
+	if (Pos.y <= 24) {
+		HitHead = true;
+	}
+	if (Pos.x < 0) {
+		Pos.x = 0;
+	}
+	if (Pos.x + HitBox.x > BordeD) {
+		Pos.x = BordeD - HitBox.x;
+	}
 
-	if (Pos.x > 0 && Pos.x+HitBox.x < BordeD && BlPlatform==false) {
-		Pos.x += Vel.x*dt;
-	}
-	else if (Pos.x <= 0 && Vel.x > BordeI && BrPlatform == false) {
-		Pos.x += Vel.x * dt;
-	}
-	else if (Pos.x + HitBox.x >= BordeD && Vel.x < BordeI && BrPlatform == false) {
-		Pos.x += Vel.x * dt;
-	}
 	//por si pasa los bordes
 	if (Pos.x < 0) {
 		Pos.x = 0;
@@ -126,6 +160,10 @@ void Player::move() {
 	if (Jumping==true) {
 		Pos.y -= JumpSpeed * dt;
 		JumpDuration += GetFrameTime();
+	}
+	if (HitHead==true) {
+		Jumping = false;
+		JumpDuration = 0;
 	}
 	//lava
 	if (Pos.x >= Lava.x && Pos.x <= Lava.y && Pos.y >= Piso - HitBox.y) {
@@ -149,7 +187,7 @@ void Player::draw() {
 	DrawTextureEx(TextureP, Pos, Rotation, Scale, WHITE);
 	//comentar o eliminar estos para la entrega estos para la entrega
 	//hitbox
-	//DrawRectangleLines(Pos.x, Pos.y, HitBox.x, HitBox.y, RED);
+	DrawRectangleLines(Pos.x, Pos.y, HitBox.x, HitBox.y, RED);
 	//piso
 	//DrawLine(20, Piso, BordeD, Piso, RED);
     //texto

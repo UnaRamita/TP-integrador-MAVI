@@ -8,6 +8,7 @@ private:
 	Texture2D BackgroundTexture;
 	Texture2D ButtonTexture;
 	Vector2 MousePos;
+	Vector2 ButtonPos;
 	Color BackGroundColor;
 
 	bool ButtonAct;
