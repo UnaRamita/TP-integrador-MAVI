@@ -4,7 +4,7 @@ Window::Window() {
 	BackgroundTexture = LoadTexture("Assets/scenery/BaseScene.png");
 	ButtonTexture = LoadTexture("Assets/scenery/buton.png");
 	FruitTexture = LoadTexture("Assets/scenery/fruit.png");
-
+	Menu = LoadTexture("Assets/scenery/Menu.png");
 	BackGroundColor = WHITE;
 
 	MousePos = GetMousePosition();
@@ -29,6 +29,7 @@ void Window::Load() {
 
 	if (gameStarted==false) {
 		// Dibujo del botón de Play
+		DrawTextureEx(Menu, { 0,0 }, 0.0f, 1.0f, WHITE);
 		DrawRectangleRec(playButton, GRAY);
 		DrawRectangleLinesEx(playButton, 2, BLACK);
 
@@ -41,12 +42,14 @@ void Window::Load() {
 
 		DrawText(txt, textX, textY, fontSize, RED);
 	}
-	//fondo
-	DrawTextureEx(BackgroundTexture, { 0,0 }, 0.0f, 1.0f, BackGroundColor);
-	//boton
-	DrawTextureEx(ButtonTexture, { ButtonPos }, 0.0f, 1.0f, BackGroundColor);
-	//fruta
-	DrawTextureEx(FruitTexture,{ 340,96 }, 0.0f, 1.0f, WHITE);
+	else {
+		//fondo
+		DrawTextureEx(BackgroundTexture, { 0,0 }, 0.0f, 1.0f, BackGroundColor);
+		//boton
+		DrawTextureEx(ButtonTexture, { ButtonPos }, 0.0f, 1.0f, BackGroundColor);
+		//fruta
+		DrawTextureEx(FruitTexture, { 340,96 }, 0.0f, 1.0f, WHITE);
+	}
 }
 void Window::Inputs() {
 	//toma la posicion del mouse

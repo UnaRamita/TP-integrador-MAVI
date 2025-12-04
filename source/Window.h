@@ -8,6 +8,7 @@ private:
 	Texture2D BackgroundTexture;
 	Texture2D ButtonTexture;
 	Texture2D FruitTexture;
+	Texture2D Menu;
 
 	Vector2 MousePos;
 	Vector2 ButtonPos;
