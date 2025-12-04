@@ -18,7 +18,7 @@ int main(void)
     //clases
     Window window;
     Player player(100, 1, 300);
-    Slime slime(336,280);
+    Slime slime(336,200);
 
     SetTargetFPS(60);
 
@@ -37,12 +37,14 @@ int main(void)
         BeginDrawing();
 
         window.Update();
-        player.Update(plataformas);
-        for (int i = 0; i < plataformas.size(); i++)
-        {
-            plataformas[i].draw();
+        if (window.IsGameStarted()==true) {
+            player.Update(plataformas, slime.getSHbx());
+            for (int i = 0; i < plataformas.size(); i++)
+            {
+                plataformas[i].draw();
+            }
+            slime.Update(plataformas);
         }
-        slime.Update(plataformas);
         // Finalizamos el dibujo
         EndDrawing();
     }

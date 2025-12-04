@@ -39,13 +39,13 @@ private:
 
 	void inputs();
 	void HbxColiderP(const std::vector<Plataformas>& plataformas);
-	void move();
+	void move(Rectangle slime);
 	void draw();
 public:
 	Player(float x, float scl, float spd);
 
 	Vector2 getpos()const { return Pos; } //esto para poner la posicion en pantalla
 	//std::vector<Plataformas>& plataformas esto es basicamente para que tome la lista de plataformas del nivel para detectar colisiones
-	void Update(const std::vector<Plataformas>& plataformas);
+	void Update(const std::vector<Plataformas>& plataformas, Rectangle slime);
 
 };
